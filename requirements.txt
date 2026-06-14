@@ -1,0 +1,14 @@
+# Core
+openai>=1.30.0
+python-dotenv>=1.0.0
+
+# Data
+pandas>=2.0.0
+numpy>=1.26.0
+sqlalchemy>=2.0.0
+
+# Visualization
+plotly>=5.18.0
+
+# App
+streamlit>=1.32.0
