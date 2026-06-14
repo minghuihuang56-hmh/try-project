@@ -3,9 +3,8 @@
 .streamlit/secrets.toml
 
 # --- Data ---
-data/hotel_bookings.csv
 data/*.db
-*.csv
+*.uploaded.csv
 
 # --- Python ---
 __pycache__/
