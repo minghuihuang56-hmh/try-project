@@ -172,7 +172,7 @@ def route(
         }
     """
     # ── 1. 客户端初始化 ────────────────────────────────────
-    resolved_key = api_key or os.getenv("API_KEY", "")
+    resolved_key = api_key or os.getenv("DEEPSEEK_API_KEY", "")
     resolved_url = base_url or os.getenv("API_BASE_URL", "")
     resolved_model = model or os.getenv("MODEL_NAME", "deepseek-chat")
 
@@ -338,10 +338,13 @@ def _build_context_block(df: pd.DataFrame, schema_info: dict) -> str:
             f"示例 {col['sample_values']}"
         )
 
+    # 只展示前 10 列（避免 32 列表格撑爆 context）
+    preview_df = df.head(5)
+    show_cols = list(preview_df.columns[:10])
     lines.extend([
         "",
-        "--- 前 5 行数据预览 ---",
-        df.head(5).to_string(),
+        f"--- 前 5 行数据预览（列: {', '.join(show_cols)}...） ---",
+        preview_df[show_cols].to_string(),
         "",
         "=" * 50,
     ])

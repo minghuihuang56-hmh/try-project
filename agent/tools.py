@@ -191,6 +191,9 @@ def make_chart(
     if df.empty:
         return {"status": "error", "message": "DataFrame 为空，无法作图"}
 
+    if not chart_type or not x_col:
+        return {"status": "error", "message": "chart_type 和 x_col 不能为空"}
+
     if x_col not in df.columns:
         return {
             "status": "error",

@@ -227,9 +227,9 @@ if "is_canceled" in df.columns and "adr" in df.columns:
 
 # ── 自动洞察 ────────────────────────────────────────────────────
 with st.expander("💡 自动数据洞察（基于统计，非 LLM）", expanded=(len(st.session_state.messages) == 0)):
-    if "insights" not in st.session_state:
-        st.session_state.insights = auto_insights(df)
-    for emoji, text in st.session_state.insights:
+    # 每次 rerun 都重新生成（数据可能换了）
+    insights = auto_insights(df)
+    for emoji, text in insights:
         st.markdown(f'<div class="insight-card">{emoji} {text}</div>', unsafe_allow_html=True)
 
 st.divider()
@@ -267,17 +267,18 @@ with cq2:
 st.divider()
 
 # ── 对话历史 ────────────────────────────────────────────────────
+dl_counter = 0  # 稳定的下载按钮 key
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.markdown(msg.get("content", ""))
         if msg.get("fig"):
             st.plotly_chart(msg["fig"], use_container_width=True)
-            # 下载按钮
             buf = io.BytesIO()
             pio.write_image(msg["fig"], buf, format="png", scale=2, width=1200, height=700)
             st.download_button("📥 下载图表 (PNG)", data=buf.getvalue(),
                                file_name="chart.png", mime="image/png",
-                               key=f"dl_{hash(str(msg.get('content',''))[-20:])}")
+                               key=f"dl_hist_{dl_counter}")
+            dl_counter += 1
         if msg["role"] == "assistant" and msg.get("steps"):
             with st.expander("🔍 查看分析思路"):
                 st.caption(f"调用了 {len(msg['steps'])} 次工具")
@@ -324,7 +325,7 @@ if prompt:
                     pio.write_image(result["fig"], buf, format="png", scale=2, width=1200, height=700)
                     st.download_button("📥 下载图表 (PNG)", data=buf.getvalue(),
                                        file_name="chart.png", mime="image/png",
-                                       key=f"dl_{abs(hash(prompt))}")
+                                       key=f"dl_new_{len(st.session_state.messages)}")
 
                 steps = result.get("steps", [])
                 if steps:
