@@ -296,8 +296,9 @@ for msg in st.session_state.messages:
                         st.caption(f"{idx}. 图表 `{ct}`")
                     if s.get("error"): st.error(f"⚠️ {s['error']}")
 
-# ── 输入框 ──────────────────────────────────────────────────────
-prompt = st.session_state.get("ask") or st.chat_input("请输入你的数据分析问题…")
+# ── 输入框（始终渲染，避免 Streamlit 状态异常）──────────────
+user_input = st.chat_input("请输入你的数据分析问题…")
+prompt = st.session_state.get("ask") or user_input
 
 if prompt:
     if st.session_state.get("ask") == prompt:
