@@ -180,7 +180,13 @@ def route(
         # 没有 API Key → 走规则模式
         return _route_rule(question, df, history)
 
-    client = OpenAI(api_key=resolved_key, base_url=resolved_url) if resolved_url else OpenAI(api_key=resolved_key)
+    from httpx import Timeout
+    client = OpenAI(
+        api_key=resolved_key,
+        base_url=resolved_url,
+        timeout=Timeout(90.0, connect=10.0),
+        max_retries=2,
+    )
 
     # ── 2. 构造上下文 ──────────────────────────────────────
     schema_info = get_schema_info(df)
