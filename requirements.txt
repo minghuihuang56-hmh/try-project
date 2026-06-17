@@ -9,6 +9,7 @@ sqlalchemy>=2.0.0
 
 # Visualization
 plotly>=5.18.0
+kaleido>=0.1.0
 
 # App
 streamlit>=1.32.0
