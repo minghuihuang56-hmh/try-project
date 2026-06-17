@@ -220,10 +220,22 @@ def route(
 
         # ── 情况 B：LLM 返回 tool_use → 执行工具 → 结果回传 ──
         if msg.tool_calls:
-            # 先把 assistant 消息加入（含 tool_calls）
-            assistant_msg = {"role": "assistant", "content": msg.content or ""}
-            if hasattr(msg, "model_extra") and msg.model_extra:
-                pass  # OpenAI 的 tool_calls 在 msg 本身上
+            # 关键：assistant 消息必须包含 tool_calls，否则后续 tool 消息报错
+            assistant_msg = {
+                "role": "assistant",
+                "content": msg.content or "",
+                "tool_calls": [
+                    {
+                        "id": tc.id,
+                        "type": "function",
+                        "function": {
+                            "name": tc.function.name,
+                            "arguments": tc.function.arguments,
+                        },
+                    }
+                    for tc in msg.tool_calls
+                ],
+            }
             messages.append(assistant_msg)
 
             for tool_call in msg.tool_calls:
